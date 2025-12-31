@@ -1,0 +1,24 @@
+# EC2 배포용 requirements.txt (CPU 전용)
+# 배포 시 USE_QLORA=false이므로 torch/transformers 제외
+# NeonDB + Gemini API 기반 RAG 서비스에 필요한 최소 패키지만 포함
+
+# LangChain 핵심 (Gemini API 사용)
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-google-genai>=0.0.12
+
+# 데이터베이스 (NeonDB PostgreSQL + pgvector)
+psycopg2-binary>=2.9.9
+pgvector>=0.2.4
+
+# FastAPI 서버
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic-settings>=2.0.0
+
+# 환경 변수 관리
+python-dotenv>=1.0.0
+
+# 참고: torch, transformers, accelerate는 배포 시 불필요
+# (USE_QLORA=false, Gemini API만 사용)
+

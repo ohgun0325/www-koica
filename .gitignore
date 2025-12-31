@@ -32,8 +32,70 @@ dist/
 Thumbs.db
 
 # ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ========================================
 # Logs
 # ========================================
 *.log
 logs/
+
+# ========================================
+# ML/AI Model Files (Large Files)
+# ========================================
+# Vision models - ignore model files but keep code files
+vision.ohgun.site/app/models/*.pt
+vision.ohgun.site/app/models/*.pth
+vision.ohgun.site/app/models/*.h5
+vision.ohgun.site/app/models/*.hdf5
+vision.ohgun.site/app/models/*.ckpt
+vision.ohgun.site/app/models/*.ckpt.data*
+vision.ohgun.site/app/models/*.bin
+vision.ohgun.site/app/models/*.safetensors
+vision.ohgun.site/app/models/*.onnx
+vision.ohgun.site/app/models/*.pb
+vision.ohgun.site/app/models/*.tflite
+vision.ohgun.site/app/models/*.pkl
+vision.ohgun.site/app/models/*.pickle
+vision.ohgun.site/app/models/*.joblib
+vision.ohgun.site/app/models/*.pth.tar
+vision.ohgun.site/app/models/*.weights
+vision.ohgun.site/app/models/*.model
+
+# Model subdirectories (if models are stored in subdirectories)
+vision.ohgun.site/app/models/checkpoints/
+vision.ohgun.site/app/models/pretrained/
+vision.ohgun.site/app/models/saved/
+vision.ohgun.site/app/models/weights/
+
+# Model file extensions (global - for other projects too)
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.ckpt
+*.ckpt.data*
+*.bin
+*.safetensors
+*.onnx
+*.pb
+*.tflite
+*.pkl
+*.pickle
+*.joblib
+*.pth.tar
+*.weights
+*.model
+
+# Model directories (common patterns)
+**/checkpoints/
+**/saved_models/
+**/pretrained/
+**/weights/
 
