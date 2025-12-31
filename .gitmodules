@@ -1,0 +1,9 @@
+[submodule "api.ohgun.site"]
+	path = api.ohgun.site
+	url = https://github.com/ohgun0325/ohgun-api.git
+[submodule "vision.ohgun.site"]
+	path = vision.ohgun.site
+	url = https://github.com/ohgun0325/ohgun-vision.git
+[submodule "chat.ohgun.site"]
+	path = chat.ohgun.site
+	url = https://github.com/ohgun0325/ohgun-chat.git
