@@ -99,3 +99,155 @@ vision.ohgun.site/app/models/weights/
 **/pretrained/
 **/weights/
 
+# ========================================
+# Build Artifacts & Compiled Files
+# ========================================
+# Java/Gradle
+build/
+target/
+*.jar
+*.war
+*.ear
+*.class
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# ========================================
+# Large Data Files
+# ========================================
+# CSV files (large datasets)
+*.csv
+!**/small_*.csv
+!**/sample_*.csv
+!**/example_*.csv
+
+# Large text files
+*.txt
+!**/README*.txt
+!**/LICENSE*.txt
+!**/CHANGELOG*.txt
+!**/requirements.txt
+!**/package.json
+
+# Large JSON files (data files, not config)
+**/data/*.json
+**/datasets/*.json
+**/raw/*.json
+*.large.json
+*.data.json
+
+# Parquet and other data formats
+*.parquet
+*.feather
+*.arrow
+*.npy
+*.npz
+
+# ========================================
+# Compressed Files
+# ========================================
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+!**/package.json
+!**/yarn.lock
+
+# ========================================
+# Source Maps (Large Files)
+# ========================================
+*.map
+!**/tsconfig.json
+
+# ========================================
+# Native Modules & Binaries
+# ========================================
+*.node
+*.dll
+*.so
+*.dylib
+*.exe
+*.bin
+!**/gradle-wrapper.jar
+
+# ========================================
+# Database Files
+# ========================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# ========================================
+# Large Font Files
+# ========================================
+*.ttf
+*.otf
+*.woff
+*.woff2
+*.eot
+!**/fonts/icon-*.ttf
+
+# ========================================
+# Media Files (Large)
+# ========================================
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+*.mp3
+*.wav
+*.flac
+*.aac
+
+# Large images (keep small ones)
+*.psd
+*.ai
+*.eps
+*.raw
+*.cr2
+*.nef
+
+# ========================================
+# Temporary & Cache Files
+# ========================================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================================
+# Project-specific Large Files
+# ========================================
+# AI/ML Service large data files
+ai.ohgun.site/mlsservice/app/**/ratings*.txt
+ai.ohgun.site/mlsservice/app/**/ratings*.csv
+ai.ohgun.site/mlsservice/submission.csv
+ai.ohgun.site/mlsservice/app/**/save/
+ai.ohgun.site/mlsservice/app/**/data/*.csv
+ai.ohgun.site/mlsservice/app/**/data/*.json
+
+# Transformer service model files
+ai.ohgun.site/transformerservice/app/**/koelectra_model/
+ai.ohgun.site/transformerservice/app/**/*.bin
+
+# Vision service outputs
+vision.ohgun.site/app/outputs/
+vision.ohgun.site/app/**/outputs/
+
+# Chat service outputs
+chat.ohgun.site/app/outputs/
+chat.ohgun.site/app/**/outputs/
+
