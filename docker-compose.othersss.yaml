@@ -1,0 +1,155 @@
+services:
+  # ========================================
+  # Database & Cache
+  # ========================================
+  db:
+    image: postgres:17-alpine
+    container_name: ohgun
+    environment:
+      - POSTGRES_DB=ohgundb
+      - POSTGRES_USER=ohgun
+      - POSTGRES_PASSWORD=Ohgun0930!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ohgun-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-Redis0930!}
+    volumes:
+      - redis-data:/data
+    networks:
+      ohgun-network:
+        aliases:
+          - redis.local
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  # ========================================
+  # Spring Cloud Gateway
+  # ========================================
+  gateway:
+    build:
+      context: ./api.ohgun.site
+      dockerfile: ./gateway/Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=${UPSTASH_REDIS_HOST}
+      - REDIS_PORT=${UPSTASH_REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${UPSTASH_REDIS_PASSWORD}
+      - REDIS_SSL_ENABLED=true
+    networks:
+      ohgun-network:
+        aliases:
+          - gateway.local
+    restart: unless-stopped
+
+  # ========================================
+  # FastAPI Services (AI/ML)
+  # ========================================
+  crawler-service:
+    build:
+      context: ./ai.ohgun.site/crawlerservice
+      dockerfile: Dockerfile
+    ports:
+      - "9001:9001"
+    container_name: crawler-service
+    networks:
+      ohgun-network:
+        aliases:
+          - crawler.local
+    restart: unless-stopped
+
+  chatbot-service:
+    build:
+      context: ./ai.ohgun.site/chatbotservice
+      dockerfile: Dockerfile
+    ports:
+      - "9002:9002"
+    container_name: chatbot-service
+    networks:
+      ohgun-network:
+        aliases:
+          - chatbot.local
+    restart: unless-stopped
+
+  mlsservice:
+    build:
+      context: ./ai.ohgun.site/mlsservice
+      dockerfile: Dockerfile
+    container_name: mlsservice
+    ports:
+      - "9004:9004"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+      - KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY}
+    volumes:
+      - ./ai.ohgun.site/mlsservice/app/nlp/save:/app/app/nlp/save
+      - ./ai.ohgun.site/mlsservice/app/us_unemployment/save:/app/app/us_unemployment/save
+    networks:
+      ohgun-network:
+        aliases:
+          - mls.local
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:9004/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+transformer-service:
+    build:
+      context: ./ai.ohgun.site/transformer
+      dockerfile: Dockerfile
+    container_name: transformer-service
+    ports:
+      - "9005:9004"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+    networks:
+      ohgun-network:
+        aliases:
+          - transformer.local
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:9004/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+
+# ========================================
+# Networks
+# ========================================
+networks:
+  ohgun-network:
+    driver: bridge
+
+# ========================================
+# Volumes
+# ========================================
+volumes:
+  postgres-data:
+  redis-data:
+
+
