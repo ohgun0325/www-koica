@@ -141,6 +141,7 @@ export default function NewsPage() {
             await page.render({
               canvasContext: context,
               viewport: viewport,
+              canvas: canvas,
             }).promise;
             
             resolve(canvas.toDataURL());
