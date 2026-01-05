@@ -395,7 +395,7 @@ export default function RatingPage() {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLogin={handleLogin}
+        onNaverLogin={handleLogin}
       />
     </div>
   );

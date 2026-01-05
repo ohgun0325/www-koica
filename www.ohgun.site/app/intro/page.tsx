@@ -6,23 +6,14 @@ import Header from '@/components/Header';
 import MainNavigation from '@/components/MainNavigation';
 import Footer from '@/components/Footer';
 import LoginModal from '@/components/LoginModal';
+import { createMainHandlers } from '@/services/mainservice';
 
 export default function IntroPage() {
   const [activeMainTab, setActiveMainTab] = useState('intro');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const handleLoginClick = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleLoginRequired = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleLogin = () => {
-    console.log('Login action triggered');
-    setIsLoginModalOpen(false);
-  };
+  const { handleLoginClick, handleLoginRequired, handleLogin } = 
+    createMainHandlers(setIsLoginModalOpen);
 
   const handleStartDiagnosis = () => {
     // ESG 진단 시작 로직
@@ -292,7 +283,7 @@ export default function IntroPage() {
       <LoginModal 
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLogin={handleLogin}
+        onNaverLogin={handleLogin}
       />
     </div>
   );

@@ -492,7 +492,7 @@ export default function NewsPage() {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLogin={handleLogin}
+        onNaverLogin={handleLogin}
       />
     </div>
   );
