@@ -1,3 +1,58 @@
+/**
+ * Refresh Token을 HttpOnly 쿠키에 저장하는 함수
+ *
+ * @param refreshToken - 저장할 Refresh Token
+ * @returns Promise<boolean> - 성공 여부
+ */
+export async function storeRefreshTokenInCookie(refreshToken: string): Promise<boolean> {
+  try {
+    const response = await fetch('/api/auth/set-cookie', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+      credentials: 'include', // 쿠키 포함
+    });
+
+    if (!response.ok) {
+      console.error('Failed to store refresh token in cookie:', response.statusText);
+      return false;
+    }
+
+    console.log('Refresh token stored in HttpOnly cookie');
+    return true;
+  } catch (error) {
+    console.error('Error storing refresh token in cookie:', error);
+    return false;
+  }
+}
+
+/**
+ * Refresh Token 쿠키 삭제 (로그아웃)
+ *
+ * @returns Promise<boolean> - 성공 여부
+ */
+export async function removeRefreshTokenCookie(): Promise<boolean> {
+  try {
+    const response = await fetch('/api/auth/set-cookie', {
+      method: 'DELETE',
+      credentials: 'include', // 쿠키 포함
+    });
+
+    if (!response.ok) {
+      console.error('Failed to remove refresh token cookie:', response.statusText);
+      return false;
+    }
+
+    console.log('Refresh token cookie removed');
+    return true;
+  } catch (error) {
+    console.error('Error removing refresh token cookie:', error);
+    return false;
+  }
+}
+
 export function createMainHandlers(setIsLoginModalOpen: (value: boolean) => void) {
   const handleLoginClick = () => {
     setIsLoginModalOpen(true);

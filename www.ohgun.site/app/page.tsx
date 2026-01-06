@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import LoginModal from '@/components/LoginModal';
 import Sidebar from '@/components/Sidebar';
+import { useAuthStore } from '@/store/authStore';
+import { removeRefreshTokenCookie } from '@/services/mainservice';
 
 interface AttachedFile {
   id: string;
@@ -18,47 +20,16 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSidebarSection, setActiveSidebarSection] = useState<'notice' | 'news' | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<{ email?: string; name?: string } | null>(null);
+
+  // Zustand 스토어에서 인증 상태 가져오기
+  const { isLoggedIn, userInfo, logout } = useAuthStore();
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 로그인 상태 확인
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken) {
-        setIsLoggedIn(true);
-        // 토큰에서 사용자 정보 추출 (JWT 디코딩은 간단하게, 실제로는 서버에서 검증 필요)
-        try {
-          const payload = JSON.parse(atob(accessToken.split('.')[1]));
-          setUserInfo({
-            email: payload.email,
-            name: payload.name,
-          });
-        } catch (e) {
-          console.error('Failed to parse token:', e);
-        }
-      } else {
-        setIsLoggedIn(false);
-        setUserInfo(null);
-      }
-    };
-
-    checkLoginStatus();
-    
-    // storage 이벤트 리스너 추가 (다른 탭에서 로그인/로그아웃 시 동기화)
-    window.addEventListener('storage', checkLoginStatus);
-    
-    // 페이지 포커스 시 다시 확인
-    window.addEventListener('focus', checkLoginStatus);
-    
-    return () => {
-      window.removeEventListener('storage', checkLoginStatus);
-      window.removeEventListener('focus', checkLoginStatus);
-    };
-  }, []);
+  // 로그인 상태는 Zustand 스토어에서 관리됨
+  // localStorage 사용 제거 - Access Token은 메모리(Zustand)에만 보관
 
   // 메시지 추가 시 스크롤
   useEffect(() => {
@@ -159,11 +130,12 @@ export default function Home() {
               </span>
             )}
             <button
-              onClick={() => {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                setIsLoggedIn(false);
-                setUserInfo(null);
+              onClick={async () => {
+                // 1. HttpOnly 쿠키에서 Refresh Token 제거
+                await removeRefreshTokenCookie();
+                
+                // 2. Zustand 스토어에서 Access Token 제거 (메모리)
+                logout();
               }}
               className="px-6 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-medium text-sm"
             >
@@ -339,22 +311,20 @@ export default function Home() {
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                      message.role === 'user'
-                        ? 'bg-[#003478] text-white'
-                        : 'bg-white/90 backdrop-blur-sm text-gray-800 shadow-sm border border-gray-200'
-                    }`}
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
+                      ? 'bg-[#003478] text-white'
+                      : 'bg-white/90 backdrop-blur-sm text-gray-800 shadow-sm border border-gray-200'
+                      }`}
                   >
                     {message.files && message.files.length > 0 && (
                       <div className="mb-2 flex flex-wrap gap-2">
                         {message.files.map((file) => (
                           <div
                             key={file.id}
-                            className={`flex items-center gap-2 rounded-lg px-2 py-1 text-xs ${
-                              message.role === 'user'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}
+                            className={`flex items-center gap-2 rounded-lg px-2 py-1 text-xs ${message.role === 'user'
+                              ? 'bg-white/20 text-white'
+                              : 'bg-gray-100 text-gray-700'
+                              }`}
                           >
                             {file.preview ? (
                               <img
@@ -433,13 +403,13 @@ export default function Home() {
         onNaverLogin={async () => {
           try {
             console.log('네이버 로그인 클릭');
-            
+
             // Gateway를 통해 OAuth 서비스에 접근
             const baseUrl = process.env.NEXT_PUBLIC_OAUTH_BASE_URL ?? 'http://localhost:8080';
             const loginUrl = `${baseUrl}/oauth/naver/login-url`;
-            
+
             console.log('Requesting login URL from:', loginUrl);
-            
+
             const response = await fetch(loginUrl, {
               method: 'GET',
               headers: {
@@ -447,9 +417,9 @@ export default function Home() {
               },
               credentials: 'include', // CORS 쿠키 포함
             });
-            
+
             console.log('Response status:', response.status);
-            
+
             if (!response.ok) {
               const errorText = await response.text();
               console.error('Failed to get login url:', {
@@ -460,16 +430,16 @@ export default function Home() {
               alert(`로그인 URL 요청 실패: ${response.status} ${response.statusText}`);
               return;
             }
-            
+
             const data = await response.json() as { url: string; state?: string };
             console.log('Received login URL:', data.url);
-            
+
             if (!data.url) {
               console.error('No URL in response:', data);
               alert('로그인 URL을 받지 못했습니다.');
               return;
             }
-            
+
             // 모달 닫고 네이버 로그인 페이지로 이동
             setIsLoginModalOpen(false);
             console.log('Redirecting to:', data.url);
