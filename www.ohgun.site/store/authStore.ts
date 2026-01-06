@@ -23,7 +23,7 @@ interface AuthState {
   setAccessToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   setUserInfo: (info: UserInfo | null) => void;
-  login: (accessToken: string, refreshToken: string | null, userInfo: UserInfo) => void;
+  login: (accessToken: string, refreshToken: string | null, userInfo: UserInfo | null) => void;
   logout: () => void;
 }
 
