@@ -2,17 +2,13 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { storeRefreshTokenInCookie } from '@/services/mainservice';
+import { handleLoginSuccess } from '@/services/mainservice';
 
 function OAuthCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
-  
-  // Zustand 스토어에서 login 함수 가져오기
-  const { login } = useAuthStore();
 
   useEffect(() => {
     const processLogin = async () => {
@@ -22,31 +18,18 @@ function OAuthCallbackContent() {
       const success = searchParams.get('success');
 
       if (success === 'true' && accessToken) {
-        // 1. Refresh Token을 HttpOnly 쿠키에 저장 (XSS 공격 방지)
-        if (refreshToken) {
-          const cookieStored = await storeRefreshTokenInCookie(refreshToken);
-          if (!cookieStored) {
-            console.warn('Failed to store refresh token in cookie, but continuing...');
-          }
+        // 로그인 성공 처리: Access Token은 Zustand에, Refresh Token은 HttpOnly 쿠키에 저장
+        const loginSuccess = await handleLoginSuccess(accessToken, refreshToken);
+
+        if (loginSuccess) {
+          setStatus('success');
+          setMessage(`${provider || '네이버'} 로그인에 성공했습니다!`);
+        } else {
+          setStatus('error');
+          setMessage('로그인 토큰 저장에 실패했습니다.');
+          return;
         }
 
-        // 2. Access Token은 메모리(Zustand)에만 저장
-        // Refresh Token은 쿠키에 저장되었으므로 Zustand에는 저장하지 않음
-        try {
-          const payload = JSON.parse(atob(accessToken.split('.')[1]));
-          login(accessToken, null, { // refreshToken을 null로 전달 (쿠키에 저장됨)
-            email: payload.email,
-            name: payload.name,
-          });
-        } catch (e) {
-          console.error('Failed to parse token:', e);
-          // 파싱 실패해도 토큰은 저장
-          login(accessToken, null, null);
-        }
-        
-        setStatus('success');
-        setMessage(`${provider || '네이버'} 로그인에 성공했습니다!`);
-        
         // 2초 후 메인 페이지로 리다이렉트
         setTimeout(() => {
           router.push('/');
@@ -58,7 +41,7 @@ function OAuthCallbackContent() {
     };
 
     processLogin();
-  }, [searchParams, router, login]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-white flex items-center justify-center">

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import LoginModal from '@/components/LoginModal';
 import Sidebar from '@/components/Sidebar';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/auth';
 import { removeRefreshTokenCookie } from '@/services/mainservice';
 
 interface AttachedFile {
@@ -133,7 +133,7 @@ export default function Home() {
               onClick={async () => {
                 // 1. HttpOnly 쿠키에서 Refresh Token 제거
                 await removeRefreshTokenCookie();
-                
+
                 // 2. Zustand 스토어에서 Access Token 제거 (메모리)
                 logout();
               }}

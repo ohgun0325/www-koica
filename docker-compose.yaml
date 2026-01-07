@@ -53,13 +53,13 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=production
-      - NEON_DB_HOST=ep-calm-credit-alrnsip1-pooler.ap-southeast-1.aws.neon.tech
+      - NEON_DB_HOST=ep-dark-violet-a1dtvvt8-pooler.ap-southeast-1.aws.neon.tech
       - NEON_DB_NAME=neondb
       - NEON_DB_USER=neondb_owner
-      - NEON_DB_PASSWORD=npg_kDZv9cRNij8A
-      - UPSTASH_REDIS_HOST=awaited-insect-5667.upstash.io
+      - NEON_DB_PASSWORD=npg_1yNpvxl5fRnK
+      - UPSTASH_REDIS_HOST=ample-puma-6304.upstash.io
       - UPSTASH_REDIS_PORT=6379
-      - UPSTASH_REDIS_PASSWORD=ARYjAAImcDIyYTNkMDE3YjJlYjA0MDVjODRjYTE5NWRjZmRmMDZ1NXAyNTY2Nw
+      - UPSTASH_REDIS_PASSWORD=ARigAAImcDFhNWZ1OTg4M2JjNmI0NTQ1YmRhYmFlMGRjZjkxNWM2YXAxNjMwNA
       - JPA_DDL_AUTO=validate
       - JPA_SHOW_SQL=false
       - JWT_SECRET=8rmCxLGo3e8nsJi7GY6EAItuzCepXAKO5VfAd9EqegNN21gE2UIHsigXIy6mBw19

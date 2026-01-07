@@ -1,3 +1,55 @@
+import { useAuthStore } from '@/store/auth';
+import type { UserInfo } from '@/store/auth';
+
+/**
+ * JWT 토큰에서 사용자 정보 추출
+ */
+function extractUserInfoFromToken(accessToken: string): UserInfo | null {
+  try {
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    return {
+      email: payload.email,
+      name: payload.name,
+    };
+  } catch (e) {
+    console.error('Failed to parse token:', e);
+    return null;
+  }
+}
+
+/**
+ * 로그인 성공 시 토큰 저장
+ *
+ * @param accessToken - Access Token (Zustand 스토어에 저장)
+ * @param refreshToken - Refresh Token (HttpOnly 쿠키에 저장)
+ * @returns Promise<boolean> - 성공 여부
+ */
+export async function handleLoginSuccess(
+  accessToken: string,
+  refreshToken: string | null
+): Promise<boolean> {
+  try {
+    // 1. Refresh Token을 HttpOnly 쿠키에 저장 (XSS 공격 방지)
+    if (refreshToken) {
+      const cookieStored = await storeRefreshTokenInCookie(refreshToken);
+      if (!cookieStored) {
+        console.warn('Failed to store refresh token in cookie, but continuing...');
+      }
+    }
+
+    // 2. Access Token은 메모리(Zustand)에만 저장
+    // Refresh Token은 쿠키에 저장되었으므로 Zustand에는 저장하지 않음
+    const userInfo = extractUserInfoFromToken(accessToken);
+    useAuthStore.getState().login(accessToken, userInfo);
+
+    console.log('Login success: Access token stored in Zustand, Refresh token stored in HttpOnly cookie');
+    return true;
+  } catch (error) {
+    console.error('Error handling login success:', error);
+    return false;
+  }
+}
+
 /**
  * Refresh Token을 HttpOnly 쿠키에 저장하는 함수
  *

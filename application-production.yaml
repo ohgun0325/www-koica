@@ -13,11 +13,11 @@ spring:
   datasource:
     # Neon PostgreSQL 연결 URL
     # 형식: jdbc:postgresql://[HOST]/[DATABASE]?sslmode=require
-    url: jdbc:postgresql://${NEON_DB_HOST:ep-withered-pond-a11avi67.ap-southeast-1.aws.neon.tech}/${NEON_DB_NAME:ohgundb}?sslmode=require
+    url: jdbc:postgresql://${NEON_DB_HOST:ep-dark-violet-a1dtvvt8-pooler.ap-southeast-1.aws.neon.tech}:5432/${NEON_DB_NAME:neondb}?sslmode=require
     
     # Neon 사용자 인증 정보
     username: ${NEON_DB_USER:neondb_owner}
-    password: ${NEON_DB_PASSWORD:}
+    password: ${NEON_DB_PASSWORD:npg_1yNpvxl5fRnK}
     
     # PostgreSQL 드라이버
     driver-class-name: org.postgresql.Driver
